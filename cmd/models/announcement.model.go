@@ -16,6 +16,7 @@ type Announcement struct {
 	Imgs           []string
 	Price          int64
 	AdvertiserName string
+	AdvertiserID   string
 	Category       string
 	Tags           []string
 }
@@ -29,6 +30,7 @@ func (a *Announcement) CreateAnnoncement(
 	imgs,
 	tags,
 	advertiserName,
+	advertiserID,
 	category string,
 	price int64) (*Announcement, error) {
 	id, err := uuid.UUID()
@@ -47,6 +49,7 @@ func (a *Announcement) CreateAnnoncement(
 		Desc:           desc,
 		Imgs:           images,
 		AdvertiserName: advertiserName,
+		AdvertiserID:   advertiserID,
 		Category:       category,
 		Price:          price,
 		Tags:           tagList,

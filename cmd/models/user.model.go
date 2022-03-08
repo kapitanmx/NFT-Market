@@ -7,17 +7,17 @@ import (
 )
 
 type User struct {
-	ID           string
-	UserName     string
-	UserLastName string
-	Email        string
-	Password     string
-	Country      string
-	Street       string
-	HouseNumber  string
-	PostalCode   string
-	City         string
-	Sex          string
+	ID           string `json:"id,omitempty"`
+	UserName     string `json:"username,omitempty" validate:"required"`
+	UserLastName string `json:"userlastname,omitempty" validate:"required"`
+	Email        string `json:"email,omitempty" validate:"required"`
+	Password     string `json:"password,omitempty" validate:"required"`
+	Country      string `json:"country,omitempty" validate:"required"`
+	Street       string `json:"street,omitempty" validate:"required"`
+	HouseNumber  string `json:"housenumber,omitempty" validate:"required"`
+	PostalCode   string `json:"postalcode,omitempty" validate:"required"`
+	City         string `json:"city,omitempty" validate:"required"`
+	Sex          string `json:"sex,omitempty"`
 	IsAdult      bool
 }
 
