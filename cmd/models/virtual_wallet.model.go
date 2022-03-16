@@ -21,7 +21,9 @@ func (v *VirtualWallet) SetID() error {
 	return nil
 }
 
-func (v *VirtualWallet) SetBalance() {}
+func (v *VirtualWallet) SetBalance(balance int64) {
+	v.Balance = balance
+}
 
 func (v *VirtualWallet) GetBalance() int64 {
 	return v.Balance
@@ -30,3 +32,5 @@ func (v *VirtualWallet) GetBalance() int64 {
 func (v *VirtualWallet) GetLastTransactions() []models.Transaction {
 	return v.LastTransactions
 }
+
+func (v *VirtualWallet) SetLastTransactions() {}
