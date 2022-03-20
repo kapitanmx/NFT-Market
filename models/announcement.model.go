@@ -14,7 +14,7 @@ type Announcement struct {
 	Title          string
 	Desc           string
 	Imgs           []string
-	Price          int64
+	Price          float64
 	AdvertiserName string
 	AdvertiserID   string
 	Category       string
@@ -32,7 +32,7 @@ func (a *Announcement) CreateAnnoncement(
 	advertiserName,
 	advertiserID,
 	category string,
-	price int64) (*Announcement, error) {
+	price float64) (*Announcement, error) {
 	id, err := uuid.UUID()
 	if err != nil {
 		return nil, err

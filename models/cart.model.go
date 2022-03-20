@@ -5,8 +5,16 @@ import (
 )
 
 type UserCart struct {
+	CartID     string
 	Products   []models.Product
 	TotalPrice int
+}
+
+func (uc *UserCart) AddProduct(product ...Product) {
+	len := 100
+	productList := make([]Product, len)
+	append(productList, product...)
+	append(uc.Products, productList)
 }
 
 func (uc *UserCart) SetSum() {

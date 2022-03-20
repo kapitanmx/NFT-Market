@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"NFTMarket/configs"
+	"NFTMarket/db"
 	"NFTMarket/models"
 	"NFTMarket/responses"
 	"context"
@@ -16,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var announcementCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
+var announcementCollection *mongo.Collection = db.GetCollection(db.DB, "users")
 var validate = validator.New()
 
 func CreateAnnouncement() gin.HandlerFunc {
@@ -26,12 +27,21 @@ func CreateAnnouncement() gin.HandlerFunc {
 		defer cancel()
 
 		if err := c.BindJSON(&announcement); err != nil {
-			c.JSON(http.StatusBadRequest, responses.AnnouncementResponse{Status: http.StatusBadRequest})
+			c.JSON(http.StatusBadRequest, 
+				responses.AnnouncementResponse{
+					Status: http.StatusBadRequest},
+				)
 			return
 		}
 
 		if validationErr := validate.Struct(&announcement); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.AnnouncementResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+			c.JSON(http.StatusBadRequest, 
+				responses.AnnouncementResponse{
+					Status: http.StatusBadRequest, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": validationErr.Error()},
+				})
 			return
 		}
 
@@ -52,10 +62,22 @@ func CreateAnnouncement() gin.HandlerFunc {
 
 		result, err := announcementCollection.InsertOne(ctx, newAnnouncement)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.AnnouncementResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, 
+				responses.AnnouncementResponse{
+					Status: http.StatusInternalServerError, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": err.Error()},
+				})
 		}
 
-		c.JSON(http.StatusCreated, responses.AnnouncementResponse{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": result}})
+		c.JSON(http.StatusCreated, 
+			responses.AnnouncementResponse{
+				Status: http.StatusCreated, 
+				Message: "success", 
+				Data: map[string]interface{}{
+					"data": result},
+			})
 	}
 }
 
@@ -69,10 +91,22 @@ func GetAnnouncement() gin.HandlerFunc {
 		objId, _ := primitive.ObjectIDFromHex(announcementId)
 		err := announcementCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&announcement)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.AnnouncementResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, 
+				responses.AnnouncementResponse{
+					Status: http.StatusInternalServerError, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": err.Error()},
+				})
 			return
 		}
-		c.JSON(http.StatusOK, responses.AnnouncementResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": announcement}})
+		c.JSON(http.StatusOK, 
+			responses.AnnouncementResponse{
+				Status: http.StatusOK, 
+				Message: "success", 
+				Data: map[string]interface{}{
+					"data": announcement},
+			})
 
 	}
 }
@@ -86,12 +120,24 @@ func EditAnnouncement() gin.HandlerFunc {
 		objId, _ := primitive.ObjectIDFromHex(announcementId)
 
 		if err := c.BindJSON(&announcement); err != nil {
-			c.JSON(http.StatusBadRequest, responses.AnnouncementResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusBadRequest, 
+				responses.AnnouncementResponse{
+					Status: http.StatusBadRequest, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": err.Error()},
+				})
 			return
 		}
 
 		if validationErr := validate.Struct(&user); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.AnnouncementResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validation.Error()}})
+			c.JSON(http.StatusBadRequest,
+				responses.AnnouncementResponse{
+					Status: http.StatusBadRequest, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": validation.Error()},
+				})
 			return
 		}
 
@@ -110,7 +156,13 @@ func EditAnnouncement() gin.HandlerFunc {
 
 		result, err := announcementCollection.UpdateOne(ctx, bson.M{"id": objId}, bson.M{"$set": update})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.AnnouncementResponse{Status: http.StatussInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, 
+				responses.AnnouncementResponse{
+					Status: http.StatussInternalServerError, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": err.Error()},
+				})
 			return
 		}
 
@@ -118,11 +170,22 @@ func EditAnnouncement() gin.HandlerFunc {
 		if result.MatchedCount == 1 {
 			err := announcementCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&updatedAnnouncement)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, responses.AnnouncementResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				c.JSON(http.StatusInternalServerError, 
+					responses.AnnouncementResponse{
+						Status: http.StatusInternalServerError, 
+						Message: "error", 
+						Data: map[string]interface{}{
+							"data": err.Error()},
+					})
 				return
 			}
 
-			c.JSON(http.StatusOK, responses.AnnouncementResponse{Status: htttp.StatusOK, Message: "success", Data: map[string]interface{}{"data": updatedAnnouncement}})
+			c.JSON(http.StatusOK, 
+				responses.AnnouncementResponse{
+					Status: htttp.StatusOK, 
+					Message: "success", 
+					Data: map[string]interface{}{"data": updatedAnnouncement},
+				})
 		}
 	}
 }
@@ -137,19 +200,34 @@ func DeleteAnnouncement() gin.HandlerFunc {
 
 		result, err := announcementCollection.DeleteOne(ctx, bson.M{"id": objId})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.AnnouncementResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(
+				http.StatusInternalServerError, 
+				responses.AnnouncementResponse{
+					Status: http.StatusInternalServerError, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": err.Error()},
+				})
 			return
 		}
 
 		if result.DeletedCount < 1 {
 			c.JSON(http.StatusNotFound,
-				responses.AnnouncementResponse{Status: http.StatusNotFound, Message: "error", Data: map[string]interface{}{"data": "Announcement with specified ID not found"}},
-			)
+				responses.AnnouncementResponse{
+					Status: http.StatusNotFound, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": "Announcement with specified ID not found"},
+				})
 			return
 		}
 		c.JSON(http.StatusOK,
-			responses.AnnouncementResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "Announcement successsfully deleted."}},
-		)
+			responses.AnnouncementResponse{
+				Status: http.StatusOK, 
+				Message: "success", 
+				Data: map[string]interface{}{
+					"data": "Announcement successsfully deleted."},
+			})
 	}
 }
 
@@ -162,22 +240,39 @@ func GetAllAnnouncements() {
 		result, err := announcementCollection.Find(ctx, bson.M{})
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.AnnouncementResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, 
+				responses.AnnouncementResponse{
+					Status: http.StatusInternalServerError, 
+					Message: "error", 
+					Data: map[string]interface{}{
+						"data": err.Error()},
+				})
 			return
 		}
 
 		defer result.Close(ctx)
+
 		for result.Next(ctx) {
 			var singleAnnouncement models.Announcement
 			if err = result.Decode(&singleAnnouncement); err != nil {
-				c.JSON(http.StatusInternalServerError, responses.AnnouncementResponse{status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				c.JSON(http.StatusInternalServerError, 
+					responses.AnnouncementResponse{
+						Status: http.StatusInternalServerError, 
+						Message: "error", 
+						Data: map[string]interface{}{
+							"data": err.Error()},
+					})
 			}
 			announcements = append(announcements, singleAnnouncement)
 		}
 
 		c.JSON(http.StatusOK,
-			responses.AnnouncementResponse{status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": announcements}}
-		)
-
+			responses.AnnouncementResponse{
+				Status: http.StatusOK, 
+				Message: "success", 
+				Data: map[string]interface{}{
+					"data": announcements
+				},
+			})
 	}
 }

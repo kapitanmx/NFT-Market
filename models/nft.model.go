@@ -3,7 +3,6 @@ package models
 import (
 	"crypto/sha256"
 	"io"
-	"log"
 	"os"
 
 	"github.com/google/uuid"
@@ -18,8 +17,6 @@ type NFT struct {
 	Img              string
 }
 
-type Hash uint
-
 func CreateNFT(
 	id,
 	creationDate,
@@ -32,21 +29,20 @@ func CreateNFT(
 		return nil, err
 	}
 	hashCode, err := generateHash()
-	nft := &NFT{
+	return &NFT{
 		TokenID:          id,
 		CreationDate:     creationDate,
 		TokenName:        name,
 		TokenHashCode:    hashCode,
 		DigitalSignature: digitalSignature,
 		Img:              img,
-	}
-	return nft, nil
+	}, nil
 }
 
 func generateHash() ([]byte, error) {
-	file, err := os.Open("keys.txt")
+	env := os.Getenv("KEYS")
+	file, err := os.Open(env)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer file.Close()
@@ -58,7 +54,6 @@ func generateHash() ([]byte, error) {
 		if n > 0 {
 			_, err := sha256.Write(buf[:n])
 			if err != nil {
-				log.Fatal(err)
 				return nil, err
 			}
 		}
@@ -68,10 +63,11 @@ func generateHash() ([]byte, error) {
 		}
 
 		if err != nil {
-			log.Printf("")
 			return nil, err
 		}
 	}
 	sum := sha256.Sum(nil)
 	return sum, nil
 }
+
+func setDigitalSignature() {}
