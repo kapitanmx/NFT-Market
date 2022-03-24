@@ -13,11 +13,11 @@ type VirtualWallet struct {
 }
 
 func (v *VirtualWallet) SetID() error {
-	id, err := uuid.UUID()
+	id, err := uuid.NewRandom()
 	if err != nil {
 		return err
 	}
-	v.ID = id
+	v.ID = id.String()
 	return nil
 }
 

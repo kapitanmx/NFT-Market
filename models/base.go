@@ -14,11 +14,11 @@ type Base struct {
 }
 
 func (b *Base) SetID() error {
-	id, err := uuid.UUID()
+	id, err := uuid.NewRandom()
 	if err != nil {
 		return err
 	}
-	b.ID = id
+	b.ID = id.String()
 	return nil
 }
 

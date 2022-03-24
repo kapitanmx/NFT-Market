@@ -4,8 +4,6 @@ import (
 	"crypto/sha256"
 	"io"
 	"os"
-
-	"github.com/google/uuid"
 )
 
 type NFT struct {
@@ -24,19 +22,25 @@ func CreateNFT(
 	digitalSignature,
 	img string,
 ) (*NFT, error) {
-	id, err := uuid.UUID()
+	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
 	hashCode, err := generateHash()
 	return &NFT{
-		TokenID:          id,
+		TokenID:          id.String(),
 		CreationDate:     creationDate,
 		TokenName:        name,
 		TokenHashCode:    hashCode,
 		DigitalSignature: digitalSignature,
 		Img:              img,
 	}, nil
+}
+ 
+func addImages(images ...string) {
+	imgs := make(string[], len(images))
+	imageCollection := append(imgs, images)
+	return imageCollection
 }
 
 func generateHash() ([]byte, error) {

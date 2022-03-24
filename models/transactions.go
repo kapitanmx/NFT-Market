@@ -25,13 +25,13 @@ func NewTransaction(
 	receiverID string,
 	sum int64,
 	date time.Time) (*Transaction, error) {
-	id, err := uuid.UUID()
+	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
 	time := date.String()
 	transaction := &Transaction{
-		ID:         id,
+		ID:         id.String(),
 		Date:       time,
 		Type:       typeOfTransaction,
 		Payer:      payer,

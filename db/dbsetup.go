@@ -1,8 +1,10 @@
 package configs
 
 import (
+	"configs"
 	"context"
 	"fmt"
+	"gin-mongo-api/configs"
 	"log"
 	"time"
 
@@ -11,7 +13,7 @@ import (
 )
 
 func ConnectDB() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI(EnvMongoURI()))
+	client, err := mongo.NewClient(options.Client().ApplyURI(configs.EnvMongoURI()))
 	if err != nil {
 		log.Fatal(err)
 	}

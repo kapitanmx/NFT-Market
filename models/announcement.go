@@ -33,7 +33,7 @@ func (a *Announcement) CreateAnnoncement(
 	advertiserID,
 	category string,
 	price float64) (*Announcement, error) {
-	id, err := uuid.UUID()
+	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (a *Announcement) CreateAnnoncement(
 	images := SetImgs(imgs)
 	tagList := SetTags(tags)
 	announcement := &Announcement{
-		ID:             id,
+		ID:             id.String(),
 		Date:           newDate,
 		ExpDate:        newExpDate,
 		Title:          title,

@@ -32,12 +32,12 @@ func (u *User) CreateUser(
 	postalCode,
 	city,
 	sex string) (*User, error) {
-	id, err := uuid.UUID()
+	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
 	user := &User{
-		ID:          id,
+		ID:          id.String(),
 		Name:        Name,
 		LastName:    LastName,
 		Email:       Email,

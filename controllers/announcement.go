@@ -136,13 +136,13 @@ func EditAnnouncement() gin.HandlerFunc {
 					Status: http.StatusBadRequest, 
 					Message: "error", 
 					Data: map[string]interface{}{
-						"data": validation.Error()},
+						"data": validationErr},
 				})
 			return
 		}
 
 		update := bson.M{
-			"date":            annoannouncement.Date,
+			"date":            announcement.Date,
 			"exp_date":        announcement.ExpDate,
 			"title":           announcement.Title,
 			"desc":            announcement.Desc,
@@ -158,7 +158,7 @@ func EditAnnouncement() gin.HandlerFunc {
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, 
 				responses.AnnouncementResponse{
-					Status: http.StatussInternalServerError, 
+					Status: http.StatusInternalServerError, 
 					Message: "error", 
 					Data: map[string]interface{}{
 						"data": err.Error()},
@@ -182,7 +182,7 @@ func EditAnnouncement() gin.HandlerFunc {
 
 			c.JSON(http.StatusOK, 
 				responses.AnnouncementResponse{
-					Status: htttp.StatusOK, 
+					Status: http.StatusOK, 
 					Message: "success", 
 					Data: map[string]interface{}{"data": updatedAnnouncement},
 				})
@@ -196,7 +196,7 @@ func DeleteAnnouncement() gin.HandlerFunc {
 		announcementId := c.Param("announcementId")
 		defer cancel()
 
-		objId, _ := primitive.ObjectIDFromHex(announcementtId)
+		objId, _ := primitive.ObjectIDFromHex(announcementId)
 
 		result, err := announcementCollection.DeleteOne(ctx, bson.M{"id": objId})
 		if err != nil {
@@ -231,10 +231,10 @@ func DeleteAnnouncement() gin.HandlerFunc {
 	}
 }
 
-func GetAllAnnouncements() {
+func GetAllAnnouncements() func(*gin.Context){
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var announcement []models.Announcement
+		var announcements []models.Announcement
 		defer cancel()
 
 		result, err := announcementCollection.Find(ctx, bson.M{})
