@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github.com/kapitanmx/NFTMarket/configs"
 	"NFTMarket/db"
 	"NFTMarket/models"
 	"NFTMarket/responses"

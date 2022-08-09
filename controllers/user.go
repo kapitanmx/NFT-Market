@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"NFTMarket/configs"
 	"NFTMarket/models"
 	"NFTMarket/responses"
 	"context"
@@ -15,7 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
+var userCollection *mongo.Collection = db.GetCollection(db.DB, "users")
 var validate = validator.New()
 
 func CreateUser() gin.HandlerFunc {

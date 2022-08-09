@@ -16,36 +16,51 @@ import (
 
 func GenerateTransaction() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var transaction models.Transaction
+		defer cancel()
 	}
 }
 
 func GetTransactionById() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		transactionId := c.Param("transactionId")
+		var transaction models.Transaction
+		defer cancel()
 	}
 }
 
 func GetTransactionsByTimeInterval() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var transaction models.Transaction
+		defer cancel()
 	}
 }
 
 func GetTransactions() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var transaction models.Transaction
+		defer cancel()
 	}
 }
 
 func EditTransaction() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		transactionId := c.Param("transactionId")
+		var transaction models.Transaction
+		defer cancel()
 	}
 }
 
 func DeleteTransaction() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		transactionId := c.Param("transactionId")
+		var transaction models.Transaction
+		defer cancel()
 	}
 }

@@ -17,17 +17,23 @@ import (
 func GenerateVirtualWallet() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var wallet models.VirtualWallet
+		defer cancel()
 	}
 }
 
 func GetWallet() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var wallet models.VirtualWallet
+		defer cancel()
 	}
 }
 
 func DeleteWallet() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var wallet models.VirtualWallet
+		defer cancel()
 	}
 }
