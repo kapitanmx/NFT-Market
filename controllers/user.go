@@ -12,71 +12,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var userCollection *mongo.Collection = db.GetCollection(db.DB, "users")
 var validate = validator.New()
-
-func CreateUser() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var user models.User
-		defer cancel()
-
-		if err := c.BindJSON(&user); err != nil {
-			c.JSON(http.StatusBadRequest,
-				responses.UserResponse{
-					Status: http.StatusBadRequest,
-				})
-			return
-		}
-
-		if validationErr := validate.Struct(&user); validationErr != nil {
-			c.JSON(http.StatusBadRequest,
-				responses.UserResponses{
-					Status:  http.StatusBadRequest,
-					Message: "error",
-					Data: map[string]interface{}{
-						"data": validationErr.Error()},
-				})
-			return
-		}
-
-		newUser := models.User{
-			ID:          user.ID,
-			Name:        user.Name,
-			LastName:    user.LastName,
-			Email:       user.Email,
-			Password:    user.Password,
-			Country:     user.Country,
-			Street:      user.Street,
-			HouseNumber: user.HouseNumber,
-			PostalCode:  user.PostalCode,
-			City:        user.City,
-			Sex:         user.Sex,
-			IsAdult:     user.IsAdult,
-		}
-
-		result, err := userCollection.InsertOne(ctx, newUser)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError,
-				responses.UserResponse{
-					Status:  http.StatusInternalServerError,
-					Message: "error",
-					Data: map[string]interface{}{
-						"data": err.Error()},
-				})
-		}
-
-		c.JSON(http.StatusCreated,
-			responses.UserResponse{
-				Status:  http.StatusCreated,
-				Message: "success",
-				Data: map[string]interface{}{
-					"data": result},
-			})
-	}
-}
 
 func GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -284,4 +224,111 @@ func GetAllUsers() gin.HandlerFunc {
 			})
 
 	}
+}
+
+func SignUp() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user models.User
+		defer cancel()
+
+		if err := c.BindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest,
+				responses.UserResponse{
+					Status: http.StatusBadRequest,
+				})
+			return
+		}
+
+		if validationErr := validate.Struct(&user); validationErr != nil {
+			c.JSON(http.StatusBadRequest,
+				responses.UserResponses{
+					Status:  http.StatusBadRequest,
+					Message: "error",
+					Data: map[string]interface{}{
+						"data": validationErr.Error()},
+				})
+			return
+		}
+
+		newUser := models.User{
+			ID:          user.ID,
+			Name:        user.Name,
+			LastName:    user.LastName,
+			Email:       user.Email,
+			Password:    user.Password,
+			Country:     user.Country,
+			Street:      user.Street,
+			HouseNumber: user.HouseNumber,
+			PostalCode:  user.PostalCode,
+			City:        user.City,
+			Sex:         user.Sex,
+			IsAdult:     user.IsAdult,
+		}
+
+		result, err := userCollection.InsertOne(ctx, newUser)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError,
+				responses.UserResponse{
+					Status:  http.StatusInternalServerError,
+					Message: "error",
+					Data: map[string]interface{}{
+						"data": err.Error()},
+				})
+		}
+
+		c.JSON(http.StatusCreated,
+			responses.UserResponse{
+				Status:  http.StatusCreated,
+				Message: "success",
+				Data: map[string]interface{}{
+					"data": result},
+			})
+	}
+}
+
+func Login() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user models.User
+		var foundUser models.User
+		if err := c.BindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)
+		defer cancel()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "user not found, login incorrect"})
+			return
+		}
+		
+		passwordIsValid, msg := VerifyPassword(*user.Password, *foundUser.Password)
+		defer cancel()
+
+		if passwordIsValid != true {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+	}
+}
+
+func HashPassword(password string) string {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		log.Panic(err)
+	}
+	return string(bytes)
+}
+
+func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
+	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
+	check := true
+	msg := ""
+
+	if err != nil {
+		msg = fmt.Sprintf("login or password is incorrect")
+		check = false
+	}
+	return check, msg
 }
