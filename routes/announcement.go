@@ -6,9 +6,9 @@ import (
 )
 
 func AnnouncementRouter(router *gin.Engine) {
-	router.POST("/announcement", controllers.CreateAnnouncement())
-	router.GET("/announcement/:_id", controllers.GetAnnouncement())
-	router.GET("/announcements", controllers.GetAllAnnouncements())
-	router.PUT("/announcement/:_id", controllers.EditAnnouncement())
-	router.DELETE("/announcement/:_id", controllers.DeleteAnnouncement())
+	router.POST("/announcements/", controllers.CreateAnnouncement())
+	router.GET("/announcements/:_id", controllers.GetAnnouncement())
+	router.GET("/announcements/", controllers.GetAllAnnouncements())
+	router.PUT("/announcements/:_id", controllers.EditAnnouncement())
+	router.DELETE("/announcements/:_id", controllers.DeleteAnnouncement())
 }
