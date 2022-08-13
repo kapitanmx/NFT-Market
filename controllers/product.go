@@ -84,6 +84,7 @@ func GetAllProducts() gin.HandlerFunc {
 		var product models.Product
 		defer cancel()
 		
+
 	}
 }
 
@@ -93,5 +94,13 @@ func DeleteProduct() gin.HandlerFunc {
 		productId := c.Param("_id")
 		var product models.Product
 		defer cancel()
+
+		result, err := productCollection.DeleteOne(ctx, bson.M{"product_id": productId})
+		if err != nil {
+			msg := Sprintf("Error: Unable to remove product")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		c.JSON(http.StatusOK, product)
 	}
 }

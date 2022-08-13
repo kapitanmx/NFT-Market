@@ -19,6 +19,11 @@ func CreateNFT() gin.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var nft model.NFT
 		defer cancel()
+		if err := c.BindJSON(&nft); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		
 	}
 }
 

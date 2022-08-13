@@ -24,6 +24,7 @@ func CreateCart() gin.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var cart models.Cart
 		var user models.User
+		userId := c.Param("user_id")
 		defer cancel()
 
 		if err := c.BindJSON(&cart); err != nil {
@@ -35,7 +36,7 @@ func CreateCart() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error", err.Error()})
 			return
 		}
-		err := userCollection.FindOne(ctx, bson.M{"user_id": cart_id}).Decode(&user)
+		err := userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
 		defer cancel()
 		if err != nil {
 			msg := Sprintf("User not found")
@@ -82,6 +83,8 @@ func ModifyCart() gin.HandlerFunc {
 			updateObj = append(updateObj, bson.E{"total_price", cart.TotalPrice})
 		}
 
+		result, err := cartCollection.UpdateOne(ctx, bson.M{"cart_id": cartId}, bson.M{"$set": updateObj})
+
 	}
 }
 
@@ -91,5 +94,12 @@ func DeleteCart() gin.HandlerFunc {
 		cartId := c.Param("cartId")
 		var cart models.Cart
 		defer cancel()
+		result, err := cartCollection.DeleteOne(ctx, bson.M{"cart_id": cartId})
+		if err != nil {
+			msg := Sprintf("Error: Unable to delete cart")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		c.JSON(http.StatusOK, cart)
 	}
 }

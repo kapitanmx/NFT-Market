@@ -14,11 +14,42 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var (
+	userCollection *mongo.Collection = db.GetCollection(db.DB, "users")
+	transactionCollection *mongo.Collection = db.GetCollection(db.DB, "transactions")
+)
+
 func GenerateTransaction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var transaction models.Transaction
+		var user models.User
+		userId := c.Param("user_id")
 		defer cancel()
+		if err := c.BindJSON(&transaction); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if validationErr := validate.Struct(transaction); validationErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		err := userCollection.FindOne(ctx, bson.M{"user_id" : userId})
+		defer cancel()
+		if err != nil {
+			msg := Sprintf("User not found")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		result, err := transactionCollection.InsertOne(ctx, transaction)
+		defer cancel()
+		if err != nil {
+			msg := Sprintf("Unable to add new transaction")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		defer cancel()
+		c.JSON(http.StatusOK, transaction)
 	}
 }
 
@@ -28,6 +59,7 @@ func GetTransactionById() gin.HandlerFunc {
 		transactionId := c.Param("transactionId")
 		var transaction models.Transaction
 		defer cancel()
+		
 	}
 }
 
