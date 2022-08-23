@@ -53,7 +53,7 @@ func GenerateTransaction() gin.HandlerFunc {
 	}
 }
 
-func GetTransactionById() gin.HandlerFunc {
+func GetTransaction() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		transactionId := c.Param("transactionId")
@@ -63,7 +63,7 @@ func GetTransactionById() gin.HandlerFunc {
 	}
 }
 
-func GetTransactionsByTimeInterval() gin.HandlerFunc {
+func GetTransactionsByTime() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var transaction models.Transaction
@@ -74,8 +74,18 @@ func GetTransactionsByTimeInterval() gin.HandlerFunc {
 func GetTransactions() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var transaction models.Transaction
+		results, err := transactionList.Find(context.TODO(), bson.M{})
 		defer cancel()
+		if err != nil {
+			msg := Sprintf("An error occured while listing transactions")
+			c.JSON(htttp.StatusBadRequest, gin.H{"error" : msg})
+			return
+		}
+		var transactions []bson.M
+		if err = results.All(ctx, &transactions); err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, transactions)
 	}
 }
 
@@ -85,6 +95,19 @@ func EditTransaction() gin.HandlerFunc {
 		transactionId := c.Param("transactionId")
 		var transaction models.Transaction
 		defer cancel()
+		if err := c.BindJSON(&transaction); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		defer cancel()
+		updateObj := primitive.D
+		result, err := transactionCollection.UpdateOne(ctx, bson.M{"transaction_id": transactionId}, bson.M{"$set": updateObj})
+		if err != nil {
+			msg := Sprintf("Unable to edit transaction")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		c.JSON(http.StatusOK, transaction)
+		defer cancel()
 	}
 }
 
@@ -93,6 +116,14 @@ func DeleteTransaction() gin.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		transactionId := c.Param("transactionId")
 		var transaction models.Transaction
+		defer cancel()
+		result, err := transactionCollection.DeleteOne(ctx, bson.M{"transaction_id": transactionId})
+		if err != nil {
+			msg := Sprintf("Error: cannot delete transaction")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		c.JSON(http.StatusOK, transaction)
 		defer cancel()
 	}
 }

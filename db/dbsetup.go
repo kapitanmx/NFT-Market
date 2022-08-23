@@ -1,10 +1,9 @@
 package configs
 
 import (
-	"configs"
 	"context"
 	"fmt"
-	"gin-mongo-api/configs"
+	"NFTMarket/configs"
 	"log"
 	"time"
 

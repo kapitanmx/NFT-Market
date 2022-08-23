@@ -7,10 +7,10 @@ import (
 
 func TransactionRoutes(router *gin.Engine) {
 	router.GET("/transactions/", controllers.GetTransactions())
-	router.GET("/transactions/:_id", controllers.GetTransactionById())
-	router.GET("transactions/:date_from/:date_to", controllers.GetTransactionsByTimeInterval())
+	router.GET("/transactions/:transaction_id", controllers.GetTransaction())
+	router.GET("transactions/:date_from/:date_to", controllers.GetTransactionsByTime())
 	router.POST("/transactions/", controllers.GenerateTransaction())
-	router.PATCH("/transactions/:_id", controllers.EditTransaction())
-	router.DELETE("/transactions/:_id", controllers.DeleteTransaction())
+	router.PATCH("/transactions/:transaction_id", controllers.EditTransaction())
+	router.DELETE("/transactions/:transaction_id", controllers.DeleteTransaction())
 }
 
